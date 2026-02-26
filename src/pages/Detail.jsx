@@ -158,7 +158,7 @@ export default function Detail() {
             {/* Genres Patchwork */}
             {data.genres && data.genres.length > 0 && (
               <div className="mb-12">
-                <p className="text-[10px] text-gray-500 font-mono tracking-widest uppercase mb-3 text-center md:text-left">Classifications</p>
+                <p className="text-[10px] text-gray-500 font-mono tracking-widest uppercase mb-3 text-center md:text-left">Genre</p>
                 <div className="flex flex-wrap justify-center md:justify-start gap-2">
                   {data.genres.map((genre) => (
                     <Link
@@ -191,8 +191,8 @@ export default function Detail() {
                         key={ch.slug}
                         to={`/chapter/${ch.slug}`}
                         className={`group flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-xl transition-all duration-300 hover:bg-white hover:text-black ${read
-                            ? "bg-white/[0.01] border-white/5 opacity-70"
-                            : "bg-white/[0.02] border-white/5"
+                          ? "bg-white/[0.01] border-white/5 opacity-70"
+                          : "bg-white/[0.02] border-white/5"
                           }`}
                       >
                         <div className="flex items-center gap-4 border-l-2 border-transparent group-hover:border-black pl-2 transition-all">
