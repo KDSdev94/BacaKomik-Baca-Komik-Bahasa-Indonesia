@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchKomikDetail } from "../api/komikApi";
 import Skeleton from "../components/Skeleton";
 import { useBookmark } from "../hooks/useBookmark";
+import { useReadHistory } from "../hooks/useReadHistory";
 
 export default function Detail() {
   const { slug } = useParams();
@@ -11,6 +12,8 @@ export default function Detail() {
     queryFn: () => fetchKomikDetail(slug),
   });
   const { addBookmark, removeBookmark, isBookmarked } = useBookmark();
+  const { getKomikHistory } = useReadHistory();
+  const readHistory = getKomikHistory(slug);
 
   if (isLoading) {
     return (
@@ -83,6 +86,38 @@ export default function Detail() {
                 <span>{bookmarked ? "Saved" : "Save"}</span>
               </button>
             </div>
+
+            {/* Read buttons */}
+            {data.chapters && data.chapters.length > 0 && (
+              <div className="mt-3 flex flex-col gap-2">
+                <Link
+                  to={`/chapter/${data.chapters[data.chapters.length - 1].slug}`}
+                  className="w-full py-3 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold text-white border border-brand-blue/40 bg-brand-blue/10 hover:bg-brand-blue hover:border-brand-blue transition-all duration-300"
+                >
+                  <i className="fas fa-book-open text-xs" />
+                  Baca Ch.1
+                </Link>
+                <Link
+                  to={`/chapter/${data.chapters[0].slug}`}
+                  className="w-full py-3 rounded-xl flex items-center justify-center gap-2 text-sm font-semibold text-white border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+                >
+                  <i className="fas fa-forward text-xs" />
+                  Baca Terakhir
+                </Link>
+
+                {/* Banner terakhir dibaca */}
+                {readHistory.lastRead && (
+                  <Link
+                    to={`/chapter/${readHistory.lastRead}`}
+                    className="w-full py-2.5 px-3 rounded-xl flex items-center gap-2 text-xs border border-green-500/20 bg-green-500/5 hover:bg-green-500/10 transition-colors"
+                  >
+                    <i className="fas fa-clock-rotate-left text-green-400 text-[10px]" />
+                    <span className="text-gray-400">Terakhir dibaca:</span>
+                    <span className="text-green-400 font-medium line-clamp-1">{readHistory.lastReadName}</span>
+                  </Link>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Right Column: Editorial Details */}
@@ -149,23 +184,37 @@ export default function Detail() {
                 </div>
 
                 <div className="space-y-3 max-h-[500px] overflow-y-auto pr-4 custom-scrollbar">
-                  {data.chapters.map((ch, idx) => (
-                    <Link
-                      key={ch.slug}
-                      to={`/chapter/${ch.slug}`}
-                      className="group flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-xl hover:bg-white hover:text-black transition-all duration-300"
-                    >
-                      <div className="flex items-center gap-4 border-l-2 border-transparent group-hover:border-black pl-2 transition-all">
-                        <span className="text-xs font-mono text-gray-500 group-hover:text-gray-400">
-                          {(data.chapters.length - idx).toString().padStart(3, '0')}
+                  {data.chapters.map((ch, idx) => {
+                    const read = readHistory.readChapters.has(ch.slug);
+                    return (
+                      <Link
+                        key={ch.slug}
+                        to={`/chapter/${ch.slug}`}
+                        className={`group flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-xl transition-all duration-300 hover:bg-white hover:text-black ${read
+                            ? "bg-white/[0.01] border-white/5 opacity-70"
+                            : "bg-white/[0.02] border-white/5"
+                          }`}
+                      >
+                        <div className="flex items-center gap-4 border-l-2 border-transparent group-hover:border-black pl-2 transition-all">
+                          <span className="text-xs font-mono text-gray-500 group-hover:text-gray-400 w-8 flex-shrink-0">
+                            {(data.chapters.length - idx).toString().padStart(3, '0')}
+                          </span>
+                          <span className={`font-medium group-hover:text-black ${read ? "text-gray-500" : "text-white"}`}>
+                            {ch.name}
+                          </span>
+                          {read && (
+                            <span className="flex items-center gap-1 text-[10px] text-green-500/70 font-mono">
+                              <i className="fas fa-check" />
+                              Dibaca
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[11px] font-mono text-gray-500 group-hover:text-gray-600 mt-2 sm:mt-0 tracking-widest uppercase">
+                          {ch.release_date || 'Unknown'}
                         </span>
-                        <span className="font-medium text-white group-hover:text-black">{ch.name}</span>
-                      </div>
-                      <span className="text-[11px] font-mono text-gray-500 group-hover:text-gray-600 mt-2 sm:mt-0 tracking-widest uppercase">
-                        {ch.release_date || 'Unknown'}
-                      </span>
-                    </Link>
-                  ))}
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             )}

@@ -1,7 +1,8 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchChapter } from "../api/komikApi";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useReadHistory } from "../hooks/useReadHistory";
 
 // Skeleton placeholder for a single chapter page image
 function PageSkeleton() {
@@ -47,10 +48,19 @@ function ChapterImage({ src, index }) {
 
 export default function Reader() {
   const { slug } = useParams();
+  const { markAsRead } = useReadHistory();
   const { data, isLoading, error } = useQuery({
     queryKey: ["chapter", slug],
     queryFn: () => fetchChapter(slug),
   });
+
+  // Catat chapter ini sebagai sudah dibaca
+  useEffect(() => {
+    if (!data) return;
+    const komikSlug = data?.chapter_list?.[0]?.slug;
+    const chapterName = data?.title || slug;
+    if (komikSlug) markAsRead(komikSlug, slug, chapterName);
+  }, [data, slug, markAsRead]);
 
   if (isLoading) {
     return (
