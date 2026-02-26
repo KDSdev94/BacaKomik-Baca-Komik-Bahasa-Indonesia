@@ -62,7 +62,7 @@ export default function Navbar() {
   return (
     <>
       {/* Top bar - desktop only */}
-      <div className="hidden md:block border-b border-white/5" style={{ background: 'rgba(15,15,20,0.65)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
+      <div className="hidden md:block border-b border-white/5 relative z-[100]" style={{ background: 'rgba(15,15,20,0.65)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' }}>
         <div className="container mx-auto max-w-6xl px-4 py-2 flex justify-between items-center text-xs text-gray-400">
           <div className="flex space-x-4">
             <a href="https://discord.gg/EAEDHZST" target="_blank" rel="noopener noreferrer" className="hover:text-white"><i className="fab fa-discord"></i> Discord</a>
